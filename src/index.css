@@ -1,0 +1,46 @@
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/IRANSans.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  body {
+    font-family: 'IRANSans', sans-serif;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  @media (min-width: 768px) {
+    html {
+      overflow: auto;
+    }
+    
+    body {
+      overflow: auto;
+    }
+    
+    #root {
+      overflow: auto;
+    }
+  }
+}
