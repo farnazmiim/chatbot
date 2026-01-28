@@ -9,6 +9,10 @@ import { CloseIcon } from '../../components/Icons'
 function Chat() {
   const [voiceActive, setVoiceActive] = useState(false)
 
+  const handleVoiceClick = () => {
+    setVoiceActive((prev) => !prev)
+  }
+
   return (
     <AppLayout showBack={true}>
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -27,22 +31,27 @@ function Chat() {
         <InputField
           placeholder="..."
           onSend={(message) => console.log('Message:', message)}
-          onVoiceClick={() => setVoiceActive((v) => !v)}
+          onVoiceClick={handleVoiceClick}
         />
       </div>
 
       {voiceActive && (
-        <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 min-w-full min-h-full">
-            <AudioVisualizer3D
-              useMicrophone
-              isMuted={false}
-              className="rounded-none"
-            />
+        <div className="fixed inset-0 z-50 backdrop-blur-md">
+          {/* Canvas layer - centered and smaller */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[400px] h-[400px] relative">
+              <AudioVisualizer3D
+                useMicrophone
+                isMuted={false}
+                compact={false}
+                // hideBackground={false}
+                className="relative w-full h-full rounded-none"
+              />
+            </div>
           </div>
           <button
             type="button"
-            onClick={() => setVoiceActive(false)}
+            onClick={handleVoiceClick}
             className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
             aria-label="بستن"
           >

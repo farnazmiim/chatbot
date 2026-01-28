@@ -11,7 +11,7 @@ export default {
       },
       colors: {
         primary: {
-          blue: '#00B4D8',
+          blue: '#00B6C7',
           turquoise: '#00D4AA',
           orange: '#FF6B35',
         },

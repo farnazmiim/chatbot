@@ -44,7 +44,11 @@ function InputField({
       />
       <button
         type="button"
-        onClick={onVoiceClick}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onVoiceClick?.()
+        }}
         className="relative w-12 h-12 flex items-center justify-center bg-primary-blue text-white rounded-lg hover:bg-opacity-90 transition-colors overflow-hidden shrink-0"
       >
         {voiceActive && voiceSlot ? (

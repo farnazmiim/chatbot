@@ -14,6 +14,8 @@ interface AudioVisualizer3DProps {
   isMuted?: boolean
   compact?: boolean
   className?: string
+  microphoneStream?: MediaStream | null
+  hideBackground?: boolean
 }
 
 export default function AudioVisualizer3D({
@@ -24,6 +26,8 @@ export default function AudioVisualizer3D({
   isMuted = true,
   compact = false,
   className = '',
+  microphoneStream = null,
+  hideBackground = false,
 }: AudioVisualizer3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<Record<string, unknown> | null>(null)
@@ -54,6 +58,7 @@ export default function AudioVisualizer3D({
   const onEndedRef = useRef(onEnded)
   const useMicrophoneRef = useRef(useMicrophone)
   const isMutedRef = useRef(isMuted)
+  const hideBackgroundRef = useRef(hideBackground)
   const rafRef = useRef<number>(0)
   const clockRef = useRef<{ getElapsedTime: () => number } | null>(null)
   const micRef = useRef<{
@@ -67,8 +72,9 @@ export default function AudioVisualizer3D({
   onEndedRef.current = onEnded
   useMicrophoneRef.current = useMicrophone
   isMutedRef.current = isMuted
+  hideBackgroundRef.current = hideBackground
 
-  const init = useCallback((container: HTMLDivElement, isCompact: boolean) => {
+  const init = useCallback((container: HTMLDivElement, isCompact: boolean, shouldHideBackground: boolean) => {
     const fallback = isCompact ? 48 : 384
     let w = container.clientWidth
     let h = container.clientHeight
@@ -94,10 +100,18 @@ export default function AudioVisualizer3D({
     camera.position.set(0, 0, 14)
     camera.lookAt(0, 0, 0)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: false,
+      powerPreference: 'high-performance'
+    })
     renderer.setSize(w, h)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
+
+    renderer.setClearColor(0x000000, 1)
     container.appendChild(renderer.domElement)
 
     const uniforms = {
@@ -117,7 +131,7 @@ export default function AudioVisualizer3D({
     })
     const geo = new THREE.IcosahedronGeometry(4, 30)
     const mesh = new THREE.Mesh(geo, mat)
-    mesh.scale.set(0.75, 0.75, 0.75)
+    mesh.scale.set(0.375, 0.375, 0.375)
     scene.add(mesh)
     meshRef.current = mesh
 
@@ -220,7 +234,7 @@ export default function AudioVisualizer3D({
     const container = containerRef.current
     if (!container) return
 
-    init(container, compact)
+    init(container, compact, hideBackground)
 
     const onResize = () => {
       const r = rendererRef.current
@@ -258,8 +272,8 @@ export default function AudioVisualizer3D({
       if (mic) {
         try {
           mic.stream.getTracks().forEach((t) => t.stop())
-          mic.context.close().catch(() => {})
-        } catch {}
+          mic.context.close().catch(() => { })
+        } catch { }
         micRef.current = null
       }
       meshRef.current = null
@@ -272,7 +286,7 @@ export default function AudioVisualizer3D({
       uniformsRef.current = null
       soundRef.current = null
     }
-  }, [init, animate, compact])
+  }, [init, animate, compact, hideBackground])
 
   useEffect(() => {
     if (!audioUrl) return
@@ -315,13 +329,57 @@ export default function AudioVisualizer3D({
       const mic = micRef.current
       if (mic) {
         try {
-          mic.stream.getTracks().forEach((t) => t.stop())
-          mic.context.close().catch(() => {})
-        } catch {}
+          // فقط اگر stream را خودمان ایجاد کرده‌ایم، آن را stop کنیم
+          if (!microphoneStream || mic.stream !== microphoneStream) {
+            mic.stream.getTracks().forEach((t) => t.stop())
+          }
+          mic.context.close().catch(() => { })
+        } catch { }
         micRef.current = null
       }
       return
     }
+
+    // اگر stream از props آمده، از آن استفاده کن
+    if (microphoneStream) {
+      let cancelled = false
+      const Ctx = typeof AudioContext !== 'undefined' ? AudioContext : (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+      const context = Ctx ? new Ctx() : null
+      if (context) {
+        context.resume().catch(() => { })
+      }
+
+      if (!context) return
+
+      try {
+        const source = context.createMediaStreamSource(microphoneStream)
+        const analyser = context.createAnalyser()
+        analyser.fftSize = 128
+        analyser.smoothingTimeConstant = 0.75
+        source.connect(analyser)
+        const data = new Uint8Array(analyser.frequencyBinCount)
+        micRef.current = { context, stream: microphoneStream, analyser, data }
+      } catch (error) {
+        console.error('Error setting up microphone stream:', error)
+        if (context) context.close().catch(() => { })
+      }
+
+      return () => {
+        cancelled = true
+        const mic = micRef.current
+        if (mic) {
+          try {
+            // stream را stop نکن چون از props آمده
+            mic.context.close().catch(() => { })
+          } catch { }
+          micRef.current = null
+        } else if (context) {
+          context.close().catch(() => { })
+        }
+      }
+    }
+
+    // در غیر این صورت، getUserMedia را خودمان صدا بزن
     let cancelled = false
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 'ontouchstart' in window
     const audioConstraints: MediaStreamConstraints['audio'] = isMobile
@@ -331,7 +389,7 @@ export default function AudioVisualizer3D({
     const Ctx = typeof AudioContext !== 'undefined' ? AudioContext : (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
     const context = Ctx ? new Ctx() : null
     if (context) {
-      context.resume().catch(() => {})
+      context.resume().catch(() => { })
     }
 
     navigator.mediaDevices
@@ -339,7 +397,7 @@ export default function AudioVisualizer3D({
       ?.then((stream) => {
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop())
-          if (context) context.close().catch(() => {})
+          if (context) context.close().catch(() => { })
           return
         }
         if (!context) {
@@ -356,11 +414,11 @@ export default function AudioVisualizer3D({
           micRef.current = { context, stream, analyser, data }
         } catch {
           stream.getTracks().forEach((t) => t.stop())
-          context.close().catch(() => {})
+          context.close().catch(() => { })
         }
       })
       ?.catch(() => {
-        if (context) context.close().catch(() => {})
+        if (context) context.close().catch(() => { })
       })
     return () => {
       cancelled = true
@@ -368,14 +426,14 @@ export default function AudioVisualizer3D({
       if (mic) {
         try {
           mic.stream.getTracks().forEach((t) => t.stop())
-          mic.context.close().catch(() => {})
-        } catch {}
+          mic.context.close().catch(() => { })
+        } catch { }
         micRef.current = null
       } else if (context) {
-        context.close().catch(() => {})
+        context.close().catch(() => { })
       }
     }
-  }, [useMicrophone, isMuted])
+  }, [useMicrophone, isMuted, microphoneStream])
 
   const min = compact ? 48 : 200
   return (

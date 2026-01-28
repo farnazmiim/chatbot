@@ -15,10 +15,8 @@ function Avatar({ type = 'bot', size = 'md', className = '' }: AvatarProps) {
 
   if (type === 'bot') {
     return (
-      <div className={`${sizeClasses[size]} ${className} flex items-center justify-center`}>
-        <div className="w-full h-full bg-gradient-to-br from-[#00B4D8] to-[#00D4AA] rounded-full flex items-center justify-center">
-          <BotIcon />
-        </div>
+      <div className={className} style={{ width: '231px', height: '216px' }}>
+        <BotIcon />
       </div>
     )
   }
@@ -26,7 +24,7 @@ function Avatar({ type = 'bot', size = 'md', className = '' }: AvatarProps) {
   // Female avatar (simplified representation)
   return (
     <div className={`${sizeClasses[size]} ${className} flex items-center justify-center`}>
-     
+
     </div>
   )
 }

@@ -19,8 +19,11 @@ function ChatBubble({ children, isUser = false, className = '' }: ChatBubbleProp
 
   return (
     <div className={`flex justify-start mb-4 ${className}`}>
-      <div className="bg-[#E8F4F8] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%] shadow-sm">
-        <p className="text-gray-800 text-sm leading-relaxed">{children}</p>
+      <div 
+        className="bg-[#0095DA] rounded-tl-[20px] rounded-br-[20px] rounded-bl-[20px] px-4 py-3 max-w-[80%]"
+        style={{ boxShadow: '0px 2px 2px 0px rgba(0, 0, 0, 0.25)' }}
+      >
+        <p className="text-white text-sm leading-relaxed">{children}</p>
       </div>
     </div>
   )

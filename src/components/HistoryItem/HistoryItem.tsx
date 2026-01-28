@@ -1,4 +1,5 @@
 import { useTheme } from '../../hooks/useTheme'
+import { ChatBubbleIcon } from '../Icons'
 
 interface HistoryItemProps {
   text: string
@@ -11,20 +12,14 @@ interface HistoryItemProps {
 function HistoryItem({
   text,
   date,
-  checked = false,
-  onToggle,
   className = '',
 }: HistoryItemProps) {
   const { textClass, textSecondaryClass, borderClass } = useTheme()
 
   return (
-    <div className={`flex items-center gap-3 py-3 border-b ${borderClass} ${className}`}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onToggle?.(e.target.checked)}
-        className="w-5 h-5 text-primary-blue border-gray-300 rounded focus:ring-primary-blue"
-      />
+    <div className={`flex items-center gap-3 py-3 ${borderClass} ${className}`}>
+      <ChatBubbleIcon className="w-[10px] h-[12px] flex-shrink-0" />
+
       <div className="flex-1">
         <p className={`${textClass} text-xs font-light`}>{text}</p>
         {date && <p className={`${textSecondaryClass} text-xs mt-1`}>{date}</p>}

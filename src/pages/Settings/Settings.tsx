@@ -79,7 +79,10 @@ function Settings() {
 
             <div className={`rounded-lg ${isNightMode ? 'bg-gray-800' : 'bg-white'}`}>
               <div className="mb-4">
-                <h4 className="text-sm font-semibold text-gray-600 mb-2 px-4 pt-2">
+                <h4
+                  className="text-[10px] font-normal mb-2 pt-2"
+                  style={{ color: '#0095DA' }}
+                >
                   امروز
                 </h4>
                 {historyData.today.map((item) => (
@@ -88,7 +91,10 @@ function Settings() {
               </div>
 
               <div className="mb-4">
-                <h4 className="text-sm font-semibold text-gray-600 mb-2 px-4 pt-2">
+                <h4
+                  className="text-[10px] font-normal mb-2 pt-2"
+                  style={{ color: '#0095DA' }}
+                >
                   یک هفته پیش
                 </h4>
                 {historyData.weekAgo.map((item) => (
@@ -97,7 +103,10 @@ function Settings() {
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-gray-600 mb-2 px-4 pt-2">
+                <h4
+                  className="text-[10px] font-normal mb-2 pt-2"
+                  style={{ color: '#0095DA' }}
+                >
                   یک ماه پیش
                 </h4>
                 {historyData.monthAgo.map((item) => (
