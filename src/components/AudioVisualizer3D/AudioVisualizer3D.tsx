@@ -40,6 +40,7 @@ export default function AudioVisualizer3D({
   } | null>(null)
   const rendererRef = useRef<{ setSize: (w: number, h: number) => void; setPixelRatio: (n: number) => void; dispose: () => void; render: (s: unknown, c: unknown) => void } | null>(null)
   const composerRef = useRef<{ setSize: (w: number, h: number) => void; setPixelRatio: (n: number) => void; render: () => void } | null>(null)
+  const renderPassRef = useRef<{ clear: boolean } | null>(null)
   const meshRef = useRef<{
     rotation: { x: number; y: number; z: number }
     scale: { set: (x: number, y: number, z: number) => void }
@@ -83,17 +84,21 @@ export default function AudioVisualizer3D({
       h = fallback
     }
     const scene = new THREE.Scene()
-    const bgCanvas = document.createElement('canvas')
-    bgCanvas.width = 256
-    bgCanvas.height = 1
-    const bgCtx = bgCanvas.getContext('2d')!
-    const bgGrad = bgCtx.createLinearGradient(0, 0, 256, 0)
-    bgGrad.addColorStop(0, '#0f1319')
-    bgGrad.addColorStop(1, '#1a0f1a')
-    bgCtx.fillStyle = bgGrad
-    bgCtx.fillRect(0, 0, 256, 1)
-    const bgTex = new THREE.CanvasTexture(bgCanvas)
-    scene.background = bgTex
+    if (!shouldHideBackground) {
+      const bgCanvas = document.createElement('canvas')
+      bgCanvas.width = 256
+      bgCanvas.height = 1
+      const bgCtx = bgCanvas.getContext('2d')!
+      const bgGrad = bgCtx.createLinearGradient(0, 0, 256, 0)
+      bgGrad.addColorStop(0, '#0f1319')
+      bgGrad.addColorStop(1, '#1a0f1a')
+      bgCtx.fillStyle = bgGrad
+      bgCtx.fillRect(0, 0, 256, 1)
+      const bgTex = new THREE.CanvasTexture(bgCanvas)
+      scene.background = bgTex
+    } else {
+      scene.background = null
+    }
 
     const aspect = w / h
     const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 1000)
@@ -111,7 +116,19 @@ export default function AudioVisualizer3D({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.outputColorSpace = THREE.SRGBColorSpace
 
-    renderer.setClearColor(0x000000, 1)
+    if (shouldHideBackground) {
+      renderer.setClearColor(0x000000, 0)
+      renderer.domElement.style.backgroundColor = 'transparent'
+      renderer.domElement.style.display = 'block'
+      renderer.domElement.style.pointerEvents = 'none'
+      renderer.domElement.style.width = '100%'
+      renderer.domElement.style.height = '100%'
+    } else {
+      renderer.setClearColor(0x000000, 1)
+    }
+    container.style.backgroundColor = 'transparent'
+    container.style.overflow = 'visible'
+    container.style.pointerEvents = 'auto'
     container.appendChild(renderer.domElement)
 
     const uniforms = {
@@ -131,11 +148,12 @@ export default function AudioVisualizer3D({
     })
     const geo = new THREE.IcosahedronGeometry(4, 30)
     const mesh = new THREE.Mesh(geo, mat)
-    mesh.scale.set(0.375, 0.375, 0.375)
+    mesh.scale.set(1.5, 1.5, 1.5)
     scene.add(mesh)
     meshRef.current = mesh
 
     const renderScene = new RenderPass(scene, camera)
+    renderPassRef.current = renderScene
     const bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), 0.4, 0.8, 0.5)
     const outputPass = new OutputPass()
     const composer = new EffectComposer(renderer)
@@ -202,7 +220,7 @@ export default function AudioVisualizer3D({
       if (mesh) {
         mesh.rotation.x = elapsed * 0.08
         mesh.rotation.z = elapsed * 0.08
-        const s = Math.min(0.9, 0.78 + smooth / 2200)
+        const s = Math.min(1.3, 1.5 + smooth / 2200)
         mesh.scale.set(s, s, s)
       }
       if (cam) {
@@ -218,6 +236,15 @@ export default function AudioVisualizer3D({
           userStoppedRef.current = false
         } else if (sound.isPlaying) {
           wasPlayingRef.current = true
+        }
+      }
+
+      // Ensure background stays transparent if hideBackground is enabled
+      if (hideBackgroundRef.current && sceneRef.current) {
+        (sceneRef.current as THREE.Scene).background = null
+        if (renderer) {
+          renderer.setClearColor(0x000000, 0)
+          renderer.domElement.style.backgroundColor = 'transparent'
         }
       }
 
@@ -278,6 +305,7 @@ export default function AudioVisualizer3D({
       }
       meshRef.current = null
       composerRef.current = null
+      renderPassRef.current = null
       rendererRef.current?.dispose()
       container.querySelector('canvas')?.remove()
       sceneRef.current = null
@@ -440,7 +468,11 @@ export default function AudioVisualizer3D({
     <div
       ref={containerRef}
       className={compact ? `relative w-full h-full ${className}` : `absolute inset-0 w-full h-full ${className}`}
-      style={{ minWidth: min, minHeight: min }}
+      style={{
+        minWidth: min,
+        minHeight: min,
+        backgroundColor: hideBackground ? 'transparent' : undefined
+      }}
     />
   )
 }
