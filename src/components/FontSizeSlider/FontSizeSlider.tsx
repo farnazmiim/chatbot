@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTheme } from '../../hooks/useTheme'
+import PersianNumber from '../PersianNumber/PersianNumber'
 
 interface FontSizeSliderProps {
   value?: number
@@ -30,7 +31,9 @@ function FontSizeSlider({
   return (
     <div className={`py-4 border-b ${borderClass} ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <span className={`${textClass} font-normal`} style={{ fontSize: `${value ?? 16}px` }}>اندازه فونت</span>
+        <span className={textClass} style={{ fontSize: `${value ?? 16}px` }}>
+          اندازه فونت <PersianNumber>{value ?? 16}</PersianNumber>
+        </span>
       </div>
       <div className="flex items-center gap-4">
         <span className={`text-sm ${textSecondaryClass}`}>A</span>

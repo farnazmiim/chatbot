@@ -21,7 +21,7 @@ function ToggleSwitch({
   
   const labelClasses = labelClassName 
     ? `${textClass} ${labelClassName}`
-    : `${textClass} font-medium`
+    : textClass
   
   const currentFontSize = fontSize ?? themeFontSize
   const labelStyle = { fontSize: `${currentFontSize * 0.875}px` }

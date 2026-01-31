@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['IRANSans', 'sans-serif'],
+        sans: ['Dana', 'sans-serif'],
       },
       colors: {
         primary: {

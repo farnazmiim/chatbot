@@ -5,7 +5,7 @@ function BotIcon({ className = '', size }: IconProps) {
     width: size || '118%',
     height: size || '100%',
     backgroundImage: 'url(/bot-sprite.png)',
-    backgroundPosition: '-615px -133px',
+    backgroundPosition: '-341px -133px',
     backgroundRepeat: 'no-repeat',
     transform: 'scale(0.5)',
     transformOrigin: 'center center',

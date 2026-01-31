@@ -38,7 +38,14 @@ export default function AudioVisualizer3D({
     lookAt: (v: unknown) => void
     updateProjectionMatrix: () => void
   } | null>(null)
-  const rendererRef = useRef<{ setSize: (w: number, h: number) => void; setPixelRatio: (n: number) => void; dispose: () => void; render: (s: unknown, c: unknown) => void } | null>(null)
+  const rendererRef = useRef<{
+    setSize: (w: number, h: number) => void
+    setPixelRatio: (n: number) => void
+    setClearColor: (color: number, alpha?: number) => void
+    dispose: () => void
+    render: (s: unknown, c: unknown) => void
+    domElement: HTMLCanvasElement
+  } | null>(null)
   const composerRef = useRef<{ setSize: (w: number, h: number) => void; setPixelRatio: (n: number) => void; render: () => void } | null>(null)
   const meshRef = useRef<{
     rotation: { x: number; y: number; z: number }
@@ -241,7 +248,7 @@ export default function AudioVisualizer3D({
       }
 
       if (hideBackgroundRef.current && sceneRef.current) {
-        (sceneRef.current as THREE.Scene).background = null
+        (sceneRef.current as { background: unknown }).background = null
         if (renderer) {
           renderer.setClearColor(0x000000, 0)
           renderer.domElement.style.backgroundColor = 'transparent'

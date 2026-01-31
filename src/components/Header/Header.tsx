@@ -26,7 +26,7 @@ function Header({ showBack = false, onMenuClick }: HeaderProps) {
     <header className="flex items-center justify-between p-4">
       <button
         onClick={handleMenuClick}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        className="p-2 hover:bg-gray-100 rounded-[14px] transition-colors"
       >
         <MenuIcon />
       </button>
@@ -34,7 +34,7 @@ function Header({ showBack = false, onMenuClick }: HeaderProps) {
       {showBack ? (
         <button
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-gray-100 rounded-[14px] transition-colors"
         >
           <BackIcon />
         </button>

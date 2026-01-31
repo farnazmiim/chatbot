@@ -5,6 +5,7 @@ import ToggleSwitch from '../../components/ToggleSwitch/ToggleSwitch'
 import FontSizeSlider from '../../components/FontSizeSlider/FontSizeSlider'
 import HistoryItem from '../../components/HistoryItem/HistoryItem'
 import Button from '../../components/Button/Button'
+import { LogoutIcon } from '../../components/Icons'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuthStore } from '../../store/authStore'
 
@@ -18,7 +19,7 @@ function Settings() {
   const handleLogout = () => {
     resetAuth()
     resetTheme()
-    navigate('/login')
+    navigate('/')
   }
 
   const historyData = {
@@ -38,43 +39,39 @@ function Settings() {
 
   return (
     <AppLayout showBack={true}>
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-6">
-          <h2 className={`font-medium mb-6 ${isNightMode ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: `${fontSize * 0.875}px` }}>
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-y-auto">
+          <div className="px-4 py-6">
+            <h2
+            className={`mb-6 ${isNightMode ? 'text-white' : 'text-gray-800'}`}
+            style={{ fontFamily: 'Dana', fontWeight: 600, fontSize: '18px' }}
+          >
             تنظیمات
           </h2>
 
           <div className={`mb-8 rounded-lg ${isNightMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <ToggleSwitch
-              label="انتخاب شخصیت"
-              checked={characterSelection}
-              onChange={setCharacterSelection}
-              labelClassName="font-normal"
-            />
-            <ToggleSwitch
-              label="گفت و گوی تصویری"
-              checked={videoChat}
-              onChange={setVideoChat}
-              labelClassName="font-normal"
-            />
+          
+           
             <ToggleSwitch
               label="حالت شب"
               checked={isNightMode}
               onChange={setNightMode}
-              labelClassName="font-normal"
             />
             <FontSizeSlider value={fontSize} onChange={setFontSize} />
           </div>
 
           <div>
-            <h3 className={`font-medium mb-6 ${isNightMode ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: `${fontSize * 0.875}px` }}>
-              تاریخچه گفت و گوهای اخیر
-            </h3>
+            <h3
+            className={`mb-6 ${isNightMode ? 'text-white' : 'text-gray-800'}`}
+            style={{ fontFamily: 'Dana', fontWeight: 600, fontSize: '18px' }}
+          >
+            تاریخچه گفت و گوهای اخیر
+          </h3>
 
             <div className={`rounded-lg ${isNightMode ? 'bg-gray-800' : 'bg-white'}`}>
               <div className="mb-4">
                 <h4
-                  className="text-[10px] font-normal mb-2 pt-2"
+                  className="text-[10px] mb-2 pt-2"
                   style={{ color: '#0095DA' }}
                 >
                   امروز
@@ -86,7 +83,7 @@ function Settings() {
 
               <div className="mb-4">
                 <h4
-                  className="text-[10px] font-normal mb-2 pt-2"
+                  className="text-[10px] mb-2 pt-2"
                   style={{ color: '#0095DA' }}
                 >
                   یک هفته پیش
@@ -98,7 +95,7 @@ function Settings() {
 
               <div>
                 <h4
-                  className="text-[10px] font-normal mb-2 pt-2"
+                  className="text-[10px] mb-2 pt-2"
                   style={{ color: '#0095DA' }}
                 >
                   یک ماه پیش
@@ -108,17 +105,21 @@ function Settings() {
                 ))}
               </div>
             </div>
+            </div>
           </div>
+        </div>
 
-          <div className="mt-8 pb-6">
-            <Button
-              variant="outline"
-              onClick={handleLogout}
-              className="text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
-            >
+        <div className="shrink-0 px-4 py-4 border-t border-gray-200">
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="text-red-600 border-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center gap-2"
+          >
+            <span className="flex items-center gap-2" dir="rtl">
+              <LogoutIcon className="shrink-0 w-5 h-5" />
               خروج از حساب کاربری
-            </Button>
-          </div>
+            </span>
+          </Button>
         </div>
       </div>
     </AppLayout>
