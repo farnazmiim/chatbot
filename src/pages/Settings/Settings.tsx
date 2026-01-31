@@ -16,17 +16,11 @@ function Settings() {
   const { reset: resetAuth } = useAuthStore()
 
   const handleLogout = () => {
-    // پاک کردن auth store
     resetAuth()
-
-    // Reset theme store
     resetTheme()
-
-    // هدایت به صفحه login
     navigate('/login')
   }
 
-  // Sample history data
   const historyData = {
     today: [
       { id: 1, text: 'لورم ایپسوم متن ساختگی' },

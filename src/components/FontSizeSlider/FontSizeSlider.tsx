@@ -15,7 +15,6 @@ function FontSizeSlider({
   const [internalValue, setInternalValue] = useState(propValue ?? 16)
   const { textClass, textSecondaryClass, borderClass } = useTheme()
 
-  // Use prop value if provided (controlled), otherwise use internal state (uncontrolled)
   const value = propValue !== undefined ? propValue : internalValue
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

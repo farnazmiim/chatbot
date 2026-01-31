@@ -40,7 +40,6 @@ export default function AudioVisualizer3D({
   } | null>(null)
   const rendererRef = useRef<{ setSize: (w: number, h: number) => void; setPixelRatio: (n: number) => void; dispose: () => void; render: (s: unknown, c: unknown) => void } | null>(null)
   const composerRef = useRef<{ setSize: (w: number, h: number) => void; setPixelRatio: (n: number) => void; render: () => void } | null>(null)
-  const renderPassRef = useRef<{ clear: boolean } | null>(null)
   const meshRef = useRef<{
     rotation: { x: number; y: number; z: number }
     scale: { set: (x: number, y: number, z: number) => void }
@@ -117,16 +116,19 @@ export default function AudioVisualizer3D({
     renderer.outputColorSpace = THREE.SRGBColorSpace
 
     if (shouldHideBackground) {
-      renderer.setClearColor(0x000000, 0)
-      renderer.domElement.style.backgroundColor = 'transparent'
-      renderer.domElement.style.display = 'block'
-      renderer.domElement.style.pointerEvents = 'none'
-      renderer.domElement.style.width = '100%'
-      renderer.domElement.style.height = '100%'
+      renderer.setClearColor(0x000000, 1)
+      const canvas = renderer.domElement
+      canvas.style.backgroundColor = 'transparent'
+      canvas.style.background = 'transparent'
+      canvas.style.display = 'block'
+      canvas.style.pointerEvents = 'none'
+      canvas.style.width = '100%'
+      canvas.style.height = '100%'
     } else {
       renderer.setClearColor(0x000000, 1)
     }
     container.style.backgroundColor = 'transparent'
+    container.style.background = 'transparent'
     container.style.overflow = 'visible'
     container.style.pointerEvents = 'auto'
     container.appendChild(renderer.domElement)
@@ -153,7 +155,6 @@ export default function AudioVisualizer3D({
     meshRef.current = mesh
 
     const renderScene = new RenderPass(scene, camera)
-    renderPassRef.current = renderScene
     const bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), 0.4, 0.8, 0.5)
     const outputPass = new OutputPass()
     const composer = new EffectComposer(renderer)
@@ -220,7 +221,7 @@ export default function AudioVisualizer3D({
       if (mesh) {
         mesh.rotation.x = elapsed * 0.08
         mesh.rotation.z = elapsed * 0.08
-        const s = Math.min(1.3, 1.5 + smooth / 2200)
+        const s = Math.min(1.3999999999, 1.5 + smooth / 2200)
         mesh.scale.set(s, s, s)
       }
       if (cam) {
@@ -239,21 +240,24 @@ export default function AudioVisualizer3D({
         }
       }
 
-      // Ensure background stays transparent if hideBackground is enabled
       if (hideBackgroundRef.current && sceneRef.current) {
         (sceneRef.current as THREE.Scene).background = null
         if (renderer) {
           renderer.setClearColor(0x000000, 0)
           renderer.domElement.style.backgroundColor = 'transparent'
+          renderer.domElement.style.background = 'transparent'
         }
       }
 
-      if (composer) composer.render()
+      if (composer) {
+        if (hideBackgroundRef.current && renderer) {
+          renderer.setClearColor(0x000000, 0)
+        }
+        composer.render()
+      }
       else if (renderer && sceneRef.current && cameraRef.current)
         (renderer as { render: (s: unknown, c: unknown) => void }).render(sceneRef.current, cameraRef.current)
-    } catch {
-      /* avoid white screen on rAF errors */
-    }
+    } catch {}
     rafRef.current = requestAnimationFrame(animate)
   }, [])
 
@@ -305,7 +309,6 @@ export default function AudioVisualizer3D({
       }
       meshRef.current = null
       composerRef.current = null
-      renderPassRef.current = null
       rendererRef.current?.dispose()
       container.querySelector('canvas')?.remove()
       sceneRef.current = null
@@ -357,7 +360,6 @@ export default function AudioVisualizer3D({
       const mic = micRef.current
       if (mic) {
         try {
-          // فقط اگر stream را خودمان ایجاد کرده‌ایم، آن را stop کنیم
           if (!microphoneStream || mic.stream !== microphoneStream) {
             mic.stream.getTracks().forEach((t) => t.stop())
           }
@@ -368,9 +370,7 @@ export default function AudioVisualizer3D({
       return
     }
 
-    // اگر stream از props آمده، از آن استفاده کن
     if (microphoneStream) {
-      let cancelled = false
       const Ctx = typeof AudioContext !== 'undefined' ? AudioContext : (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
       const context = Ctx ? new Ctx() : null
       if (context) {
@@ -393,11 +393,9 @@ export default function AudioVisualizer3D({
       }
 
       return () => {
-        cancelled = true
         const mic = micRef.current
         if (mic) {
           try {
-            // stream را stop نکن چون از props آمده
             mic.context.close().catch(() => { })
           } catch { }
           micRef.current = null
@@ -407,7 +405,6 @@ export default function AudioVisualizer3D({
       }
     }
 
-    // در غیر این صورت، getUserMedia را خودمان صدا بزن
     let cancelled = false
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 'ontouchstart' in window
     const audioConstraints: MediaStreamConstraints['audio'] = isMobile
@@ -471,7 +468,7 @@ export default function AudioVisualizer3D({
       style={{
         minWidth: min,
         minHeight: min,
-        backgroundColor: hideBackground ? 'transparent' : undefined
+        backgroundColor: hideBackground ? 'transparent' : undefined,
       }}
     />
   )

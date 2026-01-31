@@ -21,7 +21,6 @@ function Avatar({ type = 'bot', size = 'md', className = '' }: AvatarProps) {
     )
   }
 
-  // Female avatar (simplified representation)
   return (
     <div className={`${sizeClasses[size]} ${className} flex items-center justify-center`}>
 

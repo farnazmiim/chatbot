@@ -4,7 +4,6 @@ import { persist } from 'zustand/middleware'
 interface ThemeState {
   isNightMode: boolean
   fontSize: number
-  toggleNightMode: () => void
   setNightMode: (value: boolean) => void
   setFontSize: (value: number) => void
   reset: () => void
@@ -15,7 +14,6 @@ export const useThemeStore = create<ThemeState>()(
     (set) => ({
       isNightMode: false,
       fontSize: 16,
-      toggleNightMode: () => set((state) => ({ isNightMode: !state.isNightMode })),
       setNightMode: (value: boolean) => set({ isNightMode: value }),
       setFontSize: (value: number) => set({ fontSize: value }),
       reset: () => {

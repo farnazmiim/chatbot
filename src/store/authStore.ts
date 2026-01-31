@@ -24,14 +24,11 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       login: async (username: string, password: string) => {
-        // TODO: Replace with actual API call
-        // For now, simple validation
-        // بعداً می‌توانید از useLogin hook استفاده کنید
         if (username && password) {
           set({
             isAuthenticated: true,
             user: { id: '1', username },
-            token: 'mock-token', // این را بعداً با token واقعی جایگزین کنید
+            token: 'mock-token',
           })
           return true
         }

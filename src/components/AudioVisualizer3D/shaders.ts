@@ -1,9 +1,3 @@
-/**
- * 3D Audio Visualizer – شبیه ali-ghavidel/sound-analyzer
- * https://github.com/ali-ghavidel/sound-analyzer
- * Perlin + scale/FOV از فرکانس، گرادیان st.x/st.y
- */
-
 export const vertexShader = `
 uniform float u_time;
 uniform float u_frequency;

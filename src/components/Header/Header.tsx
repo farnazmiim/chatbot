@@ -14,7 +14,6 @@ function Header({ showBack = false, onMenuClick }: HeaderProps) {
     if (onMenuClick) {
       onMenuClick()
     } else {
-      // Toggle behavior: if on settings page, go back; otherwise go to settings
       if (location.pathname === '/settings') {
         navigate(-1)
       } else {

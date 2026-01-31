@@ -6,7 +6,6 @@ import Logo from '../../components/Logo/Logo'
 import { useTheme } from '../../hooks/useTheme'
 import { useLogin } from '../../hooks/api/useAuth'
 
-// Schema validation با zod
 const loginSchema = z.object({
   username: z
     .string({ required_error: 'نام کاربری الزامی است' })
@@ -24,7 +23,6 @@ function Login() {
   const navigate = useNavigate()
   const { bgClass, textClass, textSecondaryClass } = useTheme()
   const loginMutation = useLogin(() => {
-    // بعد از موفقیت در login، به صفحه اصلی هدایت می‌شود
     navigate('/')
   })
 
@@ -46,10 +44,7 @@ function Login() {
         username: data.username.trim(),
         password: data.password,
       })
-      // navigate در onSuccess callback انجام می‌شود
     } catch (error: unknown) {
-      // خطا در mutation - error message در hook throw می‌شود
-      // و در UI نمایش داده می‌شود
       console.error('Login error:', error)
     }
   }

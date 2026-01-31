@@ -37,17 +37,11 @@ function Chat() {
 
       {voiceActive && (
         <div className="fixed inset-0 z-50 backdrop-blur-md">
-          {/* Canvas layer - centered and smaller */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div 
               className="w-[350px] h-[350px] relative rounded-full overflow-hidden"
               style={{
-                boxShadow: `
-                  0 0 60px rgba(0, 182, 199, 0.6),
-                  0 0 100px rgba(0, 182, 199, 0.4),
-                  0 0 140px rgba(0, 212, 170, 0.3),
-                  inset 0 0 40px rgba(0, 182, 199, 0.2)
-                `,
+                boxShadow: 'rgba(0, 182, 199, 0.6) 0px 0px 60px, rgba(0, 182, 199, 0.4) 0px 0px 100px, rgba(0, 212, 170, 0.3) 0px 0px 140px, rgba(0, 182, 199, 0.5) 0px 0px 80px inset, rgba(0, 212, 170, 0.35) 0px 0px 120px inset',
                 border: '2px solid rgba(0, 182, 199, 0.5)',
                 background: 'transparent',
               }}

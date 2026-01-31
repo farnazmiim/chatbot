@@ -5,9 +5,7 @@ interface InputFieldProps {
   placeholder?: string
   onSend?: (message: string) => void
   onVoiceClick?: () => void
-  /** فعال بودن حالت صدا (نمایش ویزوالایزر روی آیکن) */
   voiceActive?: boolean
-  /** محتوای اسلات صدا وقتی voiceActive است (مثلاً AudioVisualizer3D فشرده) */
   voiceSlot?: React.ReactNode
   className?: string
 }
