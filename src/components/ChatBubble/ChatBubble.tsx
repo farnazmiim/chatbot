@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { SpeakerIcon, CopyIcon, DislikeIcon, LikeIcon } from '../Icons'
 
 interface ChatBubbleProps {
@@ -44,4 +44,4 @@ function ChatBubble({ children, isUser = false, className = '' }: ChatBubbleProp
   )
 }
 
-export default ChatBubble
+export default memo(ChatBubble)

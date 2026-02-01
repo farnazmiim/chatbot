@@ -1,20 +1,31 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import AppLayout from '../../components/AppLayout/AppLayout'
 import Avatar from '../../components/Avatar/Avatar'
-import AudioVisualizer3D from '../../components/AudioVisualizer3D/AudioVisualizer3D'
 import ChatBubble from '../../components/ChatBubble/ChatBubble'
 import InputField from '../../components/InputField/InputField'
-import { CloseIcon } from '../../components/Icons'
+import VoiceVideoOverlay from '../../components/VoiceVideoOverlay/VoiceVideoOverlay'
 
-type MessageItem = { type: 'user' | 'bot'; text: string }
+type MessageItem = { type: 'user' | 'bot'; text: string; id: number }
+
+const CARD_STYLE = { border: '0.35px solid #EDF0F1', boxShadow: '-1px 2px 6px 0 #D4E2ED' } as const
+const LOADING_BOX_STYLE = { backgroundColor: '#F3F4F6' } as const
 
 const INTRO_TEXT =
-  'ربات پاسخگوی هم‌راه اول برای پاسخ به سوالات شما در مورد خدمات، تعرفه‌ها، پلن‌های تشویقی، قبض و شارژ. لطفاً برای بهبود عملکرد، بعد از دریافت پاسخ بله یا خیر را انتخاب کنید و دلیل را ذکر کنید.'
+  'من، ربات پاسخگوی همراه اول، به سوالات شما درباره سرویس‌ها، تعرفه‌ها، طرح‌های تشویقی، صورتحساب و شارژ پاسخ می‌دهم. لطفاً پس از دریافت پاسخ، با انتخاب   یا    و ذکر دلیل، به بهبود عملکرد من کمک کنید.'
 
 const DEFAULT_CARDS = [
-  { id: 1, text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از' },
-  { id: 2, text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از' },
-  { id: 3, text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از' },
+  {
+    id: 1,
+    text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از',
+  },
+  {
+    id: 2,
+    text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از',
+  },
+  {
+    id: 3,
+    text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از',
+  },
 ]
 
 function Chat() {
@@ -22,23 +33,32 @@ function Chat() {
   const [messages, setMessages] = useState<MessageItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const nextIdRef = useRef(0)
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: 'smooth',
+    })
   }, [messages, isLoading])
 
-  const handleVoiceClick = () => {
-    setVoiceActive((prev) => !prev)
-  }
+  const handleVoiceClick = useCallback(() => {
+    setVoiceActive(true)
+  }, [])
 
-  const handleSend = (text: string) => {
-    setMessages((prev) => [...prev, { type: 'user', text }])
+  const handleSend = useCallback((text: string) => {
+    const userMsg: MessageItem = { type: 'user', text, id: nextIdRef.current++ }
+    setMessages((prev) => [...prev, userMsg])
     setIsLoading(true)
+    const botId = nextIdRef.current++
     setTimeout(() => {
-      setMessages((prev) => [...prev, { type: 'bot', text: 'پاسخ نمونه. (فعلاً پاسخ ثابت نمایش داده می‌شود.)' }])
+      setMessages((prev) => [
+        ...prev,
+        { type: 'bot', text: 'پاسخ نمونه. (فعلاً پاسخ ثابت نمایش داده می‌شود.)', id: botId },
+      ])
       setIsLoading(false)
     }, 1500)
-  }
+  }, [])
 
   return (
     <AppLayout showBack={true}>
@@ -47,22 +67,31 @@ function Chat() {
           ref={scrollRef}
           className="flex-1 flex flex-col px-4 py-6 overflow-y-auto min-h-0 bg-white"
         >
-          <div className="w-full flex flex-col items-center justify-start">
-            <Avatar type="bot" size="md" className="mx-auto" />
-          </div>
-
           {messages.length === 0 && (
             <>
-              <p className="text-gray-600 text-sm text-center leading-relaxed mb-6 px-2" dir="rtl">
+              <div className="w-full flex flex-col items-center justify-start">
+                <Avatar type="bot" size="md" className="mx-auto" />
+              </div>
+              <p
+                className="text-gray-600 text-sm text-center leading-relaxed mb-10 px-2"
+                dir="rtl"
+              >
                 {INTRO_TEXT}
               </p>
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4" dir="rtl">
+              <div
+                className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
+                dir="rtl"
+              >
                 {DEFAULT_CARDS.map((card) => (
                   <div
                     key={card.id}
-                    className="flex-shrink-0 w-[280px] rounded-xl bg-gray-100 border border-gray-200 p-4"
+                    className="flex-shrink-0 w-[170px] rounded-xl bg-white p-2.5"
+                    style={CARD_STYLE}
                   >
-                    <p className="text-gray-700 text-xs leading-relaxed text-right" dir="rtl">
+                    <p
+                      className="text-gray-700 text-xs leading-relaxed text-right line-clamp-3"
+                      dir="rtl"
+                    >
                       {card.text}
                     </p>
                   </div>
@@ -71,8 +100,8 @@ function Chat() {
             </>
           )}
 
-          {messages.map((msg, i) => (
-            <ChatBubble key={i} isUser={msg.type === 'user'}>
+          {messages.map((msg) => (
+            <ChatBubble key={msg.id} isUser={msg.type === 'user'}>
               {msg.text}
             </ChatBubble>
           ))}
@@ -81,7 +110,7 @@ function Chat() {
             <div className="flex justify-end mb-4" dir="rtl">
               <div
                 className="rounded-tr-[15px] rounded-br-[15px] rounded-bl-[15px] px-4 py-3 flex items-center gap-1.5"
-                style={{ backgroundColor: '#F3F4F6' }}
+                style={LOADING_BOX_STYLE}
               >
                 <span className="w-2 h-2 rounded-full bg-gray-500 animate-bounce [animation-delay:0ms]" />
                 <span className="w-2 h-2 rounded-full bg-gray-500 animate-bounce [animation-delay:150ms]" />
@@ -99,34 +128,7 @@ function Chat() {
       </div>
 
       {voiceActive && (
-        <div className="fixed inset-0 z-50 backdrop-blur-md">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div 
-              className="w-[350px] h-[350px] relative rounded-full overflow-hidden"
-              style={{
-                boxShadow: 'rgba(0, 182, 199, 0.6) 0px 0px 60px, rgba(0, 182, 199, 0.4) 0px 0px 100px, rgba(0, 212, 170, 0.3) 0px 0px 140px, rgba(0, 182, 199, 0.5) 0px 0px 80px inset, rgba(0, 212, 170, 0.35) 0px 0px 120px inset',
-                border: '2px solid rgba(0, 182, 199, 0.5)',
-                background: 'transparent',
-              }}
-            >
-              <AudioVisualizer3D
-                useMicrophone
-                isMuted={false}
-                compact={false}
-                hideBackground={true}
-                className="relative w-full h-full rounded-none"
-              />
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleVoiceClick}
-            className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
-            aria-label="بستن"
-          >
-            <CloseIcon />
-          </button>
-        </div>
+        <VoiceVideoOverlay onClose={() => setVoiceActive(false)} />
       )}
     </AppLayout>
   )

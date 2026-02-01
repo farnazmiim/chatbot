@@ -34,6 +34,43 @@
 @tailwind components;
 @tailwind utilities;
 
+input[type='range'].font-size-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  direction: ltr;
+  height: 8px;
+  border-radius: 4px;
+  /* نوار سورمهای از چپ تا انگشتی؛ A کوچک چپ، A بزرگ راست */
+  background: linear-gradient(
+    to right,
+    #1e3a5f 0%,
+    #1e3a5f var(--fill, 50%),
+    #e5e7eb var(--fill, 50%)
+  );
+  cursor: pointer;
+}
+
+input[type='range'].font-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0095DA;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+input[type='range'].font-size-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0095DA;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
 
 @layer base {
   html {
