@@ -1,13 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useLocation } from 'react-router-dom'
 import AppLayout from '../../components/AppLayout/AppLayout'
 import Avatar from '../../components/Avatar/Avatar'
 import ChatBubble from '../../components/ChatBubble/ChatBubble'
 import InputField from '../../components/InputField/InputField'
 import VoiceVideoOverlay from '../../components/VoiceVideoOverlay/VoiceVideoOverlay'
+import ChatModeBar, { type ChatMode } from '../../components/ChatModeBar/ChatModeBar'
 
 type MessageItem = { type: 'user' | 'bot'; text: string; id: number }
 
-const CARD_STYLE = { border: '0.35px solid #EDF0F1', boxShadow: '-1px 2px 6px 0 #D4E2ED' } as const
+const CARD_STYLE = {
+  border: '0.35px solid #EDF0F1',
+  boxShadow: '-1px 2px 6px 0 #D4E2ED',
+} as const
 const LOADING_BOX_STYLE = { backgroundColor: '#F3F4F6' } as const
 
 const INTRO_TEXT =
@@ -29,11 +34,24 @@ const DEFAULT_CARDS = [
 ]
 
 function Chat() {
-  const [voiceActive, setVoiceActive] = useState(false)
+  const location = useLocation()
+  const [mode, setMode] = useState<ChatMode>(
+    (location.state as { openVoice?: boolean } | null)?.openVoice ? 'voice' : 'chat'
+  )
+  const [voiceActive, setVoiceActive] = useState(
+    Boolean((location.state as { openVoice?: boolean } | null)?.openVoice)
+  )
+  const [overlayInitialMode, setOverlayInitialMode] = useState<ChatMode>('voice')
+  const [showCopyToast, setShowCopyToast] = useState(false)
   const [messages, setMessages] = useState<MessageItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const nextIdRef = useRef(0)
+
+  const handleCopied = useCallback(() => {
+    setShowCopyToast(true)
+    setTimeout(() => setShowCopyToast(false), 2000)
+  }, [])
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -43,6 +61,7 @@ function Chat() {
   }, [messages, isLoading])
 
   const handleVoiceClick = useCallback(() => {
+    setOverlayInitialMode('voice')
     setVoiceActive(true)
   }, [])
 
@@ -54,14 +73,38 @@ function Chat() {
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { type: 'bot', text: 'پاسخ نمونه. (فعلاً پاسخ ثابت نمایش داده می‌شود.)', id: botId },
+        {
+          type: 'bot',
+          text: 'پاسخ نمونه. (فعلاً پاسخ ثابت نمایش داده می‌شود.)',
+          id: botId,
+        },
       ])
       setIsLoading(false)
     }, 1500)
   }, [])
 
   return (
-    <AppLayout showBack={true}>
+    <AppLayout
+      showBack={true}
+      headerCenter={
+        <ChatModeBar
+          compact
+          mode={mode}
+          onModeChange={(m) => {
+            setMode(m)
+            if (m === 'video') {
+              setOverlayInitialMode('video')
+              setVoiceActive(true)
+            }
+            if (m === 'voice') {
+              setOverlayInitialMode('voice')
+              setVoiceActive(true)
+            }
+            if (m === 'chat') setVoiceActive(false)
+          }}
+        />
+      }
+    >
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-white">
         <div
           ref={scrollRef}
@@ -101,8 +144,13 @@ function Chat() {
           )}
 
           {messages.map((msg) => (
-            <ChatBubble key={msg.id} isUser={msg.type === 'user'}>
-              {msg.text}
+            <ChatBubble
+              key={msg.id}
+              isUser={msg.type === 'user'}
+              copyText={msg.text ?? ''}
+              onCopied={handleCopied}
+            >
+              {msg.text ?? ''}
             </ChatBubble>
           ))}
 
@@ -127,8 +175,23 @@ function Chat() {
         />
       </div>
 
+      {showCopyToast && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-5 py-3 rounded-[14px] text-white text-sm font-Dana shadow-lg"
+          style={{ backgroundColor: '#6B7280' }}
+        >
+          کپی شد
+        </div>
+      )}
+
       {voiceActive && (
-        <VoiceVideoOverlay onClose={() => setVoiceActive(false)} />
+        <VoiceVideoOverlay
+          initialMode={overlayInitialMode === 'chat' ? 'voice' : overlayInitialMode}
+          onClose={() => {
+            setVoiceActive(false)
+            setMode('chat')
+          }}
+        />
       )}
     </AppLayout>
   )

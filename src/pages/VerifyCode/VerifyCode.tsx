@@ -1,11 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
-import Logo from '../../components/Logo/Logo'
-import Button from '../../components/Button/Button'
-import { BackIcon } from '../../components/Icons'
-import { useTheme } from '../../hooks/useTheme'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { VerifyCodeHeader, OtpInputs, VerifyCodeActions } from '../../components/VerifyCode'
 import { useAuthStore } from '../../store/authStore'
-import { toPersianDigits, toEnglishDigits } from '../../lib/persianDigits'
+import { toEnglishDigits } from '../../lib/persianDigits'
 import PersianNumber from '../../components/PersianNumber/PersianNumber'
 
 const OTP_LENGTH = 5
@@ -14,7 +11,6 @@ const RESEND_SECONDS = 47
 function VerifyCode() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { textClass, textSecondaryClass } = useTheme()
   const { isAuthenticated, setAuth } = useAuthStore()
   const phone = (location.state as { phone?: string })?.phone ?? ''
   const displayPhone = phone ? `0${phone}` : ''
@@ -51,25 +47,20 @@ function VerifyCode() {
     return () => ac.abort()
   }, [])
 
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60)
-    const sec = s % 60
-    const str = `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
-    return toPersianDigits(str)
-  }
-
-  const handleChange = (index: number, value: string) => {
+  const handleDigitChange = useCallback((index: number, value: string) => {
     const normalized = toEnglishDigits(value)
     const num = normalized.replace(/\D/g, '').slice(-1)
-    const next = [...digits]
-    next[index] = num
-    setDigits(next)
+    setDigits((prev) => {
+      const next = [...prev]
+      next[index] = num
+      return next
+    })
     if (num && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus()
     }
-  }
+  }, [])
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Tab' && !e.shiftKey && index < OTP_LENGTH - 1) {
       e.preventDefault()
       inputRefs.current[index + 1]?.focus()
@@ -78,32 +69,38 @@ function VerifyCode() {
     if (e.key === 'Backspace' && !digits[index] && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }
-  }
+  }, [digits])
 
-  const handlePaste = (e: React.ClipboardEvent) => {
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
     e.preventDefault()
     const raw = e.clipboardData.getData('text')
     const pasted = toEnglishDigits(raw).replace(/\D/g, '').slice(0, OTP_LENGTH)
-    const next = [...digits]
-    pasted.split('').forEach((c, i) => { next[i] = c })
-    setDigits(next)
+    setDigits((prev) => {
+      const next = [...prev]
+      pasted.split('').forEach((c, i) => { next[i] = c })
+      return next
+    })
     const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1)
-    inputRefs.current[focusIdx]?.focus()
-  }
+    setTimeout(() => inputRefs.current[focusIdx]?.focus(), 0)
+  }, [])
+
+  const setInputRef = useCallback((index: number, el: HTMLInputElement | null) => {
+    inputRefs.current[index] = el
+  }, [])
 
   const code = digits.join('')
   const isValid = code.length === OTP_LENGTH
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (!isValid) return
     setAuth({ token: 'otp-token', user: { id: phone || 'user', username: displayPhone } })
     navigate('/chat', { replace: true })
-  }
+  }, [isValid, phone, displayPhone, setAuth, navigate])
 
-  const handleResend = () => {
+  const handleResend = useCallback(() => {
     if (secondsLeft > 0) return
     setSecondsLeft(RESEND_SECONDS)
-  }
+  }, [secondsLeft])
 
   if (isAuthenticated) {
     navigate('/chat', { replace: true })
@@ -115,76 +112,32 @@ function VerifyCode() {
   }
 
   return (
-    <div className={`min-h-screen flex flex-col ${textClass.includes('white') ? 'bg-gray-900' : 'bg-white'}`} dir="rtl">
-      <header className="flex items-center justify-between p-4 shrink-0">
-        <Link
-          to="/"
-          className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-[14px] transition-colors no-underline"
-          aria-label="صفحه قبلی"
-        >
-          <BackIcon />
-          <span className={`text-sm ${textClass}`}>صفحه قبلی</span>
-        </Link>
-        <div className="flex items-center justify-center w-[100px] h-[45px] shrink-0">
-          <Logo width={100} height={45} />
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col bg-white" dir="rtl">
+      <VerifyCodeHeader />
 
       <div className="flex-1 flex flex-col px-6 py-8 min-h-0">
-        
-        <h1
-          className={`mb-2 text-right ${textClass}`}
-          style={{ fontFamily: 'Dana', fontWeight: 600, fontSize: '18px' }}
-        >
+        <h1 className="mb-2 text-right font-semibold text-lg text-gray-800">
           کد تایید را وارد کنید
         </h1>
 
-        <p
-          className={`${textSecondaryClass} text-right my-6`}
-          style={{ fontFamily: 'Dana', fontWeight: 400, fontSize: '14px' }}
-        >
+        <p className="text-gray-600 text-right my-6 font-normal text-sm">
           کد ۵ رقمی به شماره <PersianNumber>{displayPhone}</PersianNumber> ارسال شد.
         </p>
 
-        <div className="flex gap-2 justify-center mb-8" dir="ltr" onPaste={handlePaste}>
-          {digits.map((d, i) => (
-            <input
-              key={i}
-              ref={(el) => { inputRefs.current[i] = el }}
-              type="tel"
-              inputMode="numeric"
-              maxLength={1}
-              value={toPersianDigits(d)}
-              onChange={(e) => handleChange(i, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(i, e)}
-              className={`w-12 h-12 text-center text-lg rounded-lg border-2 bg-transparent ${textClass} focus:outline-none focus:ring-2 focus:ring-[#0095DA] focus:border-transparent ${
-                textClass.includes('white') ? 'border-gray-600' : 'border-gray-300'
-              }`}
-              style={{ fontFamily: 'Dana' }}
-              dir="ltr"
-            />
-          ))}
-        </div>
+        <OtpInputs
+          digits={digits}
+          onDigitChange={handleDigitChange}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          setInputRef={setInputRef}
+        />
 
-        <div className="mt-auto pt-6 flex flex-col gap-4">
-        
-          <Button variant="primary" onClick={handleConfirm} disabled={!isValid}>
-            تایید
-          </Button>
-
-          <p className={`text-sm ${textSecondaryClass} text-center`}>
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={secondsLeft > 0}
-              className={secondsLeft > 0 ? 'opacity-70 cursor-not-allowed' : 'underline'}
-            >
-              {secondsLeft > 0
-                ? `${formatTime(secondsLeft)} تا درخواست مجدد کد`
-                : 'درخواست مجدد کد'}
-            </button>
-          </p>
-        </div>
+        <VerifyCodeActions
+          isValid={isValid}
+          onConfirm={handleConfirm}
+          secondsLeft={secondsLeft}
+          onResend={handleResend}
+        />
       </div>
     </div>
   )

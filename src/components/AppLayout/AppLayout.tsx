@@ -1,20 +1,18 @@
 import { type ReactNode } from 'react'
 import Header from '../Header/Header'
-import { useTheme } from '../../hooks/useTheme'
 
 interface AppLayoutProps {
   children: ReactNode
   showBack?: boolean
   onMenuClick?: () => void
+  headerCenter?: ReactNode
   className?: string
 }
 
-function AppLayout({ children, showBack = false, onMenuClick, className = '' }: AppLayoutProps) {
-  const { bgClass } = useTheme()
-
+function AppLayout({ children, showBack = false, onMenuClick, headerCenter, className = '' }: AppLayoutProps) {
   return (
-    <div className={`h-[100dvh] md:h-auto md:min-h-screen ${bgClass} flex flex-col overflow-hidden ${className}`}>
-      <Header showBack={showBack} onMenuClick={onMenuClick} />
+    <div className={`h-[100dvh] md:h-auto md:min-h-screen bg-white flex flex-col overflow-hidden ${className}`}>
+      <Header showBack={showBack} onMenuClick={onMenuClick} centerContent={headerCenter} />
       {children}
     </div>
   )

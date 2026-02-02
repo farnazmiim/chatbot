@@ -1,18 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import AppLayout from '../../components/AppLayout/AppLayout'
 import Button from '../../components/Button/Button'
-import { useTheme } from '../../hooks/useTheme'
 import PersianNumber from '../../components/PersianNumber/PersianNumber'
 
 function NotFound() {
   const navigate = useNavigate()
-  const { textClass, textSecondaryClass, isNightMode } = useTheme()
-  const accentColor = isNightMode ? '#e5e7eb' : '#1e3a5f'
+  const accentColor = '#1e3a5f'
 
   return (
     <AppLayout showBack={false}>
       <div
-        className={`flex-1 flex flex-col items-center justify-center px-6 min-h-0 ${textClass}`}
+        className="flex-1 flex flex-col items-center justify-center px-6 min-h-0 text-gray-800"
         dir="rtl"
       >
         <p
@@ -21,7 +19,7 @@ function NotFound() {
         >
           <PersianNumber>404</PersianNumber>
         </p>
-        <p className={`text-center mb-8 font-Dana text-[18px] font-medium ${textSecondaryClass}`}>
+        <p className="text-center mb-8 font-Dana text-[18px] font-medium text-gray-600">
           صفحه مورد نظر پیدا نشد
         </p>
         <div className="w-full max-w-xs">

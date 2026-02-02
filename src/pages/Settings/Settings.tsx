@@ -1,20 +1,49 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppLayout from '../../components/AppLayout/AppLayout'
-import ToggleSwitch from '../../components/ToggleSwitch/ToggleSwitch'
 import FontSizeSlider from '../../components/FontSizeSlider/FontSizeSlider'
-import HistoryItem from '../../components/HistoryItem/HistoryItem'
 import Button from '../../components/Button/Button'
 import { LogoutIcon } from '../../components/Icons'
+import {
+  SettingsHistorySection,
+  ChatColorPicker,
+  SoundModePicker,
+  CharacterPicker,
+} from '../../components/Settings'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuthStore } from '../../store/authStore'
 
+const HISTORY_DATA = {
+  today: [
+    { id: 1, text: 'لورم ایپسوم متن ساختگی' },
+    { id: 2, text: 'لورم ایپسوم متن ساختگی' },
+  ],
+  weekAgo: [
+    { id: 3, text: 'لورم ایپسوم متن ساختگی' },
+    { id: 4, text: 'لورم ایپسوم متن ساختگی' },
+  ],
+  monthAgo: [
+    { id: 5, text: 'لورم ایپسوم متن ساختگی' },
+    { id: 6, text: 'لورم ایپسوم متن ساختگی' },
+  ],
+} as const
+
 function Settings() {
   const navigate = useNavigate()
-  const [characterSelection, setCharacterSelection] = useState(true)
-  const [videoChat, setVideoChat] = useState(true)
-  const { isNightMode, setNightMode, fontSize, setFontSize, reset: resetTheme } = useThemeStore()
+  const {
+    fontSize,
+    setFontSize,
+    chatColor,
+    setChatColor,
+    soundMode,
+    setSoundMode,
+    characterId,
+    setCharacterId,
+    reset: resetTheme,
+  } = useThemeStore()
   const { reset: resetAuth } = useAuthStore()
+
+  const [historySearch, setHistorySearch] = useState('')
 
   const handleLogout = () => {
     resetAuth()
@@ -22,94 +51,35 @@ function Settings() {
     navigate('/')
   }
 
-  const historyData = {
-    today: [
-      { id: 1, text: 'لورم ایپسوم متن ساختگی' },
-      { id: 2, text: 'لورم ایپسوم متن ساختگی' },
-    ],
-    weekAgo: [
-      { id: 3, text: 'لورم ایپسوم متن ساختگی' },
-      { id: 4, text: 'لورم ایپسوم متن ساختگی' },
-    ],
-    monthAgo: [
-      { id: 5, text: 'لورم ایپسوم متن ساختگی' },
-      { id: 6, text: 'لورم ایپسوم متن ساختگی' },
-    ],
-  }
-
   return (
     <AppLayout showBack={true}>
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 overflow-y-auto">
           <div className="px-4 py-6">
-            <h2
-            className={`mb-6 ${isNightMode ? 'text-white' : 'text-gray-800'}`}
-            style={{ fontFamily: 'Dana', fontWeight: 600, fontSize: '18px' }}
-          >
-            تنظیمات
-          </h2>
-
-          <div className={`mb-8 rounded-lg ${isNightMode ? 'bg-gray-800' : 'bg-white'}`}>
-          
-           
-            <ToggleSwitch
-              label="حالت شب"
-              checked={isNightMode}
-              onChange={setNightMode}
+            <SettingsHistorySection
+              searchValue={historySearch}
+              onSearchChange={setHistorySearch}
+              today={HISTORY_DATA.today}
+              weekAgo={HISTORY_DATA.weekAgo}
+              monthAgo={HISTORY_DATA.monthAgo}
             />
-            <FontSizeSlider value={fontSize} onChange={setFontSize} />
-          </div>
 
-          <div>
-            <h3
-            className={`mb-6 ${isNightMode ? 'text-white' : 'text-gray-800'}`}
-            style={{ fontFamily: 'Dana', fontWeight: 600, fontSize: '18px' }}
-          >
-            تاریخچه گفت و گوهای اخیر
-          </h3>
+            <div className="pt-4 pb-4 border-t border-gray-200">
+              <h2 className="mb-6 text-gray-800 font-semibold text-lg">
+                تنظیمات
+              </h2>
 
-            <div className={`rounded-lg ${isNightMode ? 'bg-gray-800' : 'bg-white'}`}>
-              <div className="mb-4">
-                <h4
-                  className="text-[10px] mb-2 pt-2"
-                  style={{ color: '#0095DA' }}
-                >
-                  امروز
-                </h4>
-                {historyData.today.map((item) => (
-                  <HistoryItem key={item.id} text={item.text} />
-                ))}
+              <div className="mb-8 rounded-lg bg-white">
+                <ChatColorPicker value={chatColor} onChange={setChatColor} />
+                <SoundModePicker value={soundMode} onChange={setSoundMode} />
+                <CharacterPicker value={characterId} onChange={setCharacterId} />
+                <FontSizeSlider value={fontSize} onChange={setFontSize} />
               </div>
-
-              <div className="mb-4">
-                <h4
-                  className="text-[10px] mb-2 pt-2"
-                  style={{ color: '#0095DA' }}
-                >
-                  یک هفته پیش
-                </h4>
-                {historyData.weekAgo.map((item) => (
-                  <HistoryItem key={item.id} text={item.text} />
-                ))}
-              </div>
-
-              <div>
-                <h4
-                  className="text-[10px] mb-2 pt-2"
-                  style={{ color: '#0095DA' }}
-                >
-                  یک ماه پیش
-                </h4>
-                {historyData.monthAgo.map((item) => (
-                  <HistoryItem key={item.id} text={item.text} />
-                ))}
-              </div>
-            </div>
             </div>
           </div>
         </div>
 
-        <div className="shrink-0 px-4 py-4 border-t border-gray-200">
+        <div className="shrink-0 px-4 py-4">
           <Button
             variant="outline"
             onClick={handleLogout}

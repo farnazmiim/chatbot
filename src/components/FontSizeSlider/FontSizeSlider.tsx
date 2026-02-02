@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTheme } from '../../hooks/useTheme'
 import PersianNumber from '../PersianNumber/PersianNumber'
 
 interface FontSizeSliderProps {
@@ -14,7 +13,7 @@ function FontSizeSlider({
   className = '',
 }: FontSizeSliderProps) {
   const [internalValue, setInternalValue] = useState(propValue ?? 16)
-  const { borderClass } = useTheme()
+  const labelColor = '#1e3a5f'
 
   const value = propValue !== undefined ? propValue : internalValue
 
@@ -28,18 +27,15 @@ function FontSizeSlider({
     }
   }
 
-  /* چپ = کوچک (۱۲)، راست = بزرگ (۲۴)؛ درصد پر شده از چپ تا انگشتی */
   const fillPercent = ((value - 12) / (24 - 12)) * 100
 
   return (
-    <div className={`py-4 border-b ${borderClass} ${className}`}>
+    <div className={`py-4 ${className}`}>
       <div className="flex items-center justify-between mb-3" dir="rtl">
         <span
-          className="font-Dana"
           style={{
             fontSize: `${value ?? 16}px`,
-            color: '#1e3a5f',
-            fontFamily: 'Dana',
+            color: labelColor,
           }}
         >
           اندازه فونت <PersianNumber>{value ?? 16}</PersianNumber>
@@ -48,7 +44,7 @@ function FontSizeSlider({
       <div className="flex items-center gap-3" dir="ltr">
         <span
           className="text-xs shrink-0"
-          style={{ color: '#1e3a5f', fontFamily: 'Dana' }}
+          style={{ color: labelColor }}
         >
           A
         </span>
@@ -67,7 +63,7 @@ function FontSizeSlider({
         />
         <span
           className="text-lg shrink-0"
-          style={{ color: '#1e3a5f', fontFamily: 'Dana' }}
+          style={{ color: labelColor }}
         >
           A
         </span>

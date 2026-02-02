@@ -11,7 +11,6 @@
   src: url('/fonts/Dana-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -19,7 +18,6 @@
   src: url('/fonts/Dana-DemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
@@ -27,7 +25,6 @@
   src: url('/fonts/Dana-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
 }
 
 @tailwind base;
@@ -40,7 +37,6 @@ input[type='range'].font-size-slider {
   direction: ltr;
   height: 8px;
   border-radius: 4px;
-  /* نوار سورمهای از چپ تا انگشتی؛ A کوچک چپ، A بزرگ راست */
   background: linear-gradient(
     to right,
     #1e3a5f 0%,
@@ -56,7 +52,7 @@ input[type='range'].font-size-slider::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #0095DA;
+  background: #0095da;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
@@ -65,19 +61,18 @@ input[type='range'].font-size-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #0095DA;
+  background: #0095da;
   cursor: pointer;
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
-
 
 @layer base {
   html {
     height: 100%;
     overflow: hidden;
   }
-  
+
   body {
     font-family: 'Dana', sans-serif;
     height: 100%;
@@ -85,21 +80,21 @@ input[type='range'].font-size-slider::-moz-range-thumb {
     margin: 0;
     padding: 0;
   }
-  
+
   #root {
     height: 100%;
     overflow: hidden;
   }
-  
+
   @media (min-width: 768px) {
     html {
       overflow: auto;
     }
-    
+
     body {
       overflow: auto;
     }
-    
+
     #root {
       overflow: auto;
     }

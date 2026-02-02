@@ -8,12 +8,44 @@ function AudioWaveIcon({ className = 'w-6 h-6', size }: IconProps) {
       className={className}
       style={style}
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="4" y="8" width="2" height="8" rx="1" />
-      <rect x="10" y="4" width="2" height="16" rx="1" />
-      <rect x="16" y="6" width="2" height="12" rx="1" />
+      <path
+        d="M3 8.25V15.75"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.5 5.75V18.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 3.25V20.75"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M16.5 5.75V18.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M21 8.25V15.75"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }

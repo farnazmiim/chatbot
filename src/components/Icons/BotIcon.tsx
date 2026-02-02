@@ -4,11 +4,11 @@ function BotIcon({ className = '', size }: IconProps) {
   const baseStyle: React.CSSProperties = {
     width: size || '118%',
     height: size || '100%',
-    backgroundImage: 'url(/bot-sprite.png)',
-    backgroundPosition: '-341px -133px',
+    backgroundImage:
+      "image-set(url('/bot.webp') type('image/webp'), url('/bot-lcp.png') type('image/png'))",
+    backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
-    transform: 'scale(0.5)',
-    transformOrigin: 'center center',
+    backgroundPosition: 'center',
   }
 
   const style = size

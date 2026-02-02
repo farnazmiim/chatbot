@@ -1,4 +1,4 @@
-import { useTheme } from '../../hooks/useTheme'
+import { useThemeStore } from '../../store/themeStore'
 
 interface ToggleSwitchProps {
   label: string
@@ -15,15 +15,14 @@ function ToggleSwitch({
   onChange,
   className = '',
   labelClassName,
-  fontSize,
+  fontSize: propFontSize,
 }: ToggleSwitchProps) {
-  const { textClass, borderClass, fontSize: themeFontSize } = useTheme()
+  const storeFontSize = useThemeStore((s) => s.fontSize)
+  const currentFontSize = propFontSize ?? storeFontSize
 
   const labelClasses = labelClassName
-    ? `${textClass} ${labelClassName}`
-    : textClass
-
-  const currentFontSize = fontSize ?? themeFontSize
+    ? `text-gray-800 ${labelClassName}`
+    : 'text-gray-800'
   const labelStyle = { fontSize: `${currentFontSize * 0.875}px` }
 
   const trackStyle = checked
@@ -39,7 +38,7 @@ function ToggleSwitch({
 
   return (
     <div
-      className={`flex items-center justify-between py-4 ${borderClass} ${className}`}
+      className={`flex items-center justify-between py-4 border-gray-200 ${className}`}
     >
       <span className={labelClasses} style={labelStyle}>
         {label}

@@ -15,7 +15,10 @@ function Avatar({ type = 'bot', size = 'md', className = '' }: AvatarProps) {
 
   if (type === 'bot') {
     return (
-      <div className={className} style={{ width: '231px', height: '216px' }}>
+      <div
+        className={`flex justify-center items-center ${className}`.trim()}
+        style={{ width: '231px', height: '216px' }}
+      >
         <BotIcon />
       </div>
     )
