@@ -127,12 +127,19 @@ function VerifyCode() {
     setSecondsLeft(RESEND_SECONDS)
   }, [secondsLeft])
 
-  if (isAuthenticated) {
-    navigate('/chat', { replace: true })
-    return null
-  }
-  if (!phone) {
-    navigate('/', { replace: true })
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/chat', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
+
+  useEffect(() => {
+    if (!phone) {
+      navigate('/', { replace: true })
+    }
+  }, [phone, navigate])
+
+  if (isAuthenticated || !phone) {
     return null
   }
 

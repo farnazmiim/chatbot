@@ -11,7 +11,7 @@ interface AppLayoutProps {
 
 function AppLayout({ children, showBack = false, onMenuClick, headerCenter, className = '' }: AppLayoutProps) {
   return (
-    <div className={`h-[100dvh] md:h-auto md:min-h-screen bg-white flex flex-col overflow-hidden ${className}`}>
+    <div className={`h-[100dvh] md:h-auto md:min-h-screen bg-white flex flex-col overflow-hidden md:max-w-lg md:mx-auto md:shadow-lg ${className}`}>
       <Header showBack={showBack} onMenuClick={onMenuClick} centerContent={headerCenter} />
       <main id="main-content" className="flex-1 overflow-y-auto flex flex-col min-h-0" tabIndex={-1}>
         {children}

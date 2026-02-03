@@ -53,9 +53,21 @@ function Chat() {
   const bottomAnchorRef = useRef<HTMLDivElement>(null)
   const nextIdRef = useRef(0)
 
+  const copyToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const handleCopied = useCallback(() => {
+    if (copyToastTimerRef.current) clearTimeout(copyToastTimerRef.current)
     setShowCopyToast(true)
-    setTimeout(() => setShowCopyToast(false), 2000)
+    copyToastTimerRef.current = setTimeout(() => {
+      setShowCopyToast(false)
+      copyToastTimerRef.current = null
+    }, 2000)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (copyToastTimerRef.current) clearTimeout(copyToastTimerRef.current)
+    }
   }, [])
 
   useEffect(() => {
@@ -78,12 +90,16 @@ function Chat() {
     setVoiceActive(true)
   }, [])
 
+  const botResponseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const handleSend = useCallback((text: string) => {
+    if (botResponseTimerRef.current) clearTimeout(botResponseTimerRef.current)
     const userMsg: MessageItem = { type: 'user', text, id: nextIdRef.current++ }
     setMessages((prev) => [...prev, userMsg])
     setIsLoading(true)
     const botId = nextIdRef.current++
-    setTimeout(() => {
+    botResponseTimerRef.current = setTimeout(() => {
+      botResponseTimerRef.current = null
       setMessages((prev) => [
         ...prev,
         {
@@ -94,6 +110,12 @@ function Chat() {
       ])
       setIsLoading(false)
     }, 1500)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (botResponseTimerRef.current) clearTimeout(botResponseTimerRef.current)
+    }
   }, [])
 
   return (
