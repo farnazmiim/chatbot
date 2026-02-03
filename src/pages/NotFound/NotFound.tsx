@@ -2,9 +2,11 @@ import { useNavigate } from 'react-router-dom'
 import AppLayout from '../../components/AppLayout/AppLayout'
 import Button from '../../components/Button/Button'
 import PersianNumber from '../../components/PersianNumber/PersianNumber'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 
 function NotFound() {
   const navigate = useNavigate()
+  useDocumentTitle('صفحه پیدا نشد')
   const accentColor = '#1e3a5f'
 
   return (

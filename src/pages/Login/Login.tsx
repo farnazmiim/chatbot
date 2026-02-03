@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppLayout from '../../components/AppLayout/AppLayout'
 import { LoginIntroCard, LoginFormSection } from '../../components/Login'
 import { useAuthStore } from '../../store/authStore'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { toEnglishDigits } from '../../lib/persianDigits'
 
 const isValidIranMobile = (value: string): boolean => {
@@ -23,6 +24,7 @@ function Login() {
   const { isAuthenticated } = useAuthStore()
   const [phone, setPhone] = useState('')
   const [phoneError, setPhoneError] = useState('')
+  useDocumentTitle('ورود')
 
   useEffect(() => {
     if (isAuthenticated) {

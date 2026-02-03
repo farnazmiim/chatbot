@@ -12,9 +12,9 @@ interface ChatBubbleProps {
 }
 
 const USER_BUBBLE_COLORS = {
-  purple: '#6B21A8',
-  black: '#000000',
-  cyan: '#0095DA',
+  purple: '#A955A8',
+  black: '#1E1E1E',
+  cyan: '#3DB3EA',
 } as const
 
 function ChatBubble({ children, isUser = false, className = '', copyText, onCopied }: ChatBubbleProps) {
@@ -116,34 +116,28 @@ function ChatBubble({ children, isUser = false, className = '', copyText, onCopi
       >
         <p className="text-gray-800 text-sm leading-relaxed">{displayText}</p>
         <div className="flex items-center justify-end gap-3 mt-2 pt-2 border-t border-gray-200" dir="rtl" style={{ color: '#071465' }}>
-          <span
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
             onClick={handleSpeak}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                handleSpeak()
-              }
-            }}
-            className="p-1 hover:opacity-80 transition-opacity cursor-pointer"
+            className="p-1 hover:opacity-80 transition-opacity"
             aria-label="پخش صدا"
             title="پخش صدا"
           >
             <SpeakerIcon className="w-[11px] h-[11px]" />
-          </span>
+          </button>
           <button
             type="button"
             onClick={handleCopy}
             className="p-1 hover:opacity-80 transition-opacity relative"
             aria-label="کپی"
+            title="کپی"
           >
             <CopyIcon className="w-[11px] h-[11px]" />
           </button>
-          <button type="button" className="p-1 hover:opacity-80 transition-opacity" aria-label="منفی">
+          <button type="button" className="p-1 hover:opacity-80 transition-opacity" aria-label="نپسندیدم" title="نپسندیدم">
             <DislikeIcon className="w-[11px] h-[11px]" />
           </button>
-          <button type="button" className="p-1 hover:opacity-80 transition-opacity" aria-label="مثبت">
+          <button type="button" className="p-1 hover:opacity-80 transition-opacity" aria-label="پسندیدم" title="پسندیدم">
             <LikeIcon className="w-[11px] h-[11px]" />
           </button>
         </div>

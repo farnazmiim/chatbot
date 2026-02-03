@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
-import Avatar from '../Avatar/Avatar'
 import ChatModeBar from '../ChatModeBar/ChatModeBar'
+import { CHARACTER_IMAGES, CHARACTER_NAMES } from '../../lib/characterImages'
+import { useThemeStore } from '../../store/themeStore'
 
 const AudioVisualizer3D = lazy(() => import('../AudioVisualizer3D/AudioVisualizer3D'))
 import { CloseIcon, MicrophoneIcon } from '../Icons'
@@ -24,6 +25,7 @@ interface VoiceVideoOverlayProps {
 function VoiceVideoOverlay({ onClose, initialMode = 'voice' }: VoiceVideoOverlayProps) {
   const [overlayMode, setOverlayMode] = useState<OverlayMode>(initialMode)
   const [isMuted, setIsMuted] = useState(false)
+  const characterId = useThemeStore((s) => s.characterId)
 
   return (
     <div
@@ -47,11 +49,15 @@ function VoiceVideoOverlay({ onClose, initialMode = 'voice' }: VoiceVideoOverlay
           <div className="w-10 h-10 shrink-0" aria-hidden />
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4 min-h-0">
+        <main className="flex-1 flex flex-col items-center justify-center px-4 min-h-0" aria-label="صفحه ویدئو یا صدا">
           {overlayMode === 'video' ? (
             <>
               <div className="mb-6 flex items-center justify-center">
-                <Avatar type="female" size="lg" />
+                <img
+                  src={CHARACTER_IMAGES[characterId]}
+                  alt={`شخصیت ${CHARACTER_NAMES[characterId]}`}
+                  className="w-32 h-32 rounded-full object-cover"
+                />
               </div>
               <p className="text-gray-500 text-sm" dir="rtl">
                 ویدئو چت
@@ -84,11 +90,11 @@ function VoiceVideoOverlay({ onClose, initialMode = 'voice' }: VoiceVideoOverlay
               </p>
             </>
           )}
-        </div>
+        </main>
 
         <div className="px-4 pb-6 pt-2">
           <div
-            className="flex justify-center items-center gap-4 rounded-full backdrop-blur-md px-4 py-3 shadow-sm w-fit mx-auto"
+            className="flex justify-center items-center gap-4 rounded-full backdrop-blur-md px-4 py-3 shadow-sm w-[184px] mx-auto"
             style={PILL_BG_STYLE}
           >
             <button
@@ -96,7 +102,7 @@ function VoiceVideoOverlay({ onClose, initialMode = 'voice' }: VoiceVideoOverlay
               className={`w-14 h-14 rounded-full ${BTN_GRAY} flex items-center justify-center transition-colors text-white`}
               aria-label="بستن"
             >
-              <CloseIcon className="w-6 h-6" />
+              <CloseIcon size={28} />
             </button>
             <button
               onClick={() => setIsMuted((m) => !m)}
@@ -105,7 +111,7 @@ function VoiceVideoOverlay({ onClose, initialMode = 'voice' }: VoiceVideoOverlay
               }`}
               aria-label={isMuted ? 'میکروفون خاموش' : 'میکروفون روشن'}
             >
-              <MicrophoneIcon className="w-6 h-6" />
+              <MicrophoneIcon size={28} />
             </button>
           </div>
         </div>

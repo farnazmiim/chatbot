@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { VerifyCodeHeader, OtpInputs, VerifyCodeActions } from '../../components/VerifyCode'
+import {
+  VerifyCodeHeader,
+  OtpInputs,
+  VerifyCodeActions,
+} from '../../components/VerifyCode'
 import { useAuthStore } from '../../store/authStore'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { toEnglishDigits } from '../../lib/persianDigits'
 import PersianNumber from '../../components/PersianNumber/PersianNumber'
 
@@ -14,6 +19,7 @@ function VerifyCode() {
   const { isAuthenticated, setAuth } = useAuthStore()
   const phone = (location.state as { phone?: string })?.phone ?? ''
   const displayPhone = phone ? `0${phone}` : ''
+  useDocumentTitle('تأیید کد')
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS)
@@ -26,7 +32,8 @@ function VerifyCode() {
   }, [secondsLeft])
 
   useEffect(() => {
-    if (typeof navigator === 'undefined' || !('credentials' in navigator)) return
+    if (typeof navigator === 'undefined' || !('credentials' in navigator))
+      return
     const ac = new AbortController()
     const req = navigator.credentials.get({
       otp: { transport: ['sms'] },
@@ -58,18 +65,24 @@ function VerifyCode() {
     if (num && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus()
     }
+    if (num && index === OTP_LENGTH - 1) {
+      setTimeout(() => inputRefs.current[OTP_LENGTH - 1]?.blur(), 0)
+    }
   }, [])
 
-  const handleKeyDown = useCallback((index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Tab' && !e.shiftKey && index < OTP_LENGTH - 1) {
-      e.preventDefault()
-      inputRefs.current[index + 1]?.focus()
-      return
-    }
-    if (e.key === 'Backspace' && !digits[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus()
-    }
-  }, [digits])
+  const handleKeyDown = useCallback(
+    (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Tab' && !e.shiftKey && index < OTP_LENGTH - 1) {
+        e.preventDefault()
+        inputRefs.current[index + 1]?.focus()
+        return
+      }
+      if (e.key === 'Backspace' && !digits[index] && index > 0) {
+        inputRefs.current[index - 1]?.focus()
+      }
+    },
+    [digits]
+  )
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     e.preventDefault()
@@ -77,23 +90,35 @@ function VerifyCode() {
     const pasted = toEnglishDigits(raw).replace(/\D/g, '').slice(0, OTP_LENGTH)
     setDigits((prev) => {
       const next = [...prev]
-      pasted.split('').forEach((c, i) => { next[i] = c })
+      pasted.split('').forEach((c, i) => {
+        next[i] = c
+      })
       return next
     })
-    const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1)
-    setTimeout(() => inputRefs.current[focusIdx]?.focus(), 0)
+    if (pasted.length >= OTP_LENGTH) {
+      setTimeout(() => inputRefs.current[OTP_LENGTH - 1]?.blur(), 0)
+    } else {
+      const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1)
+      setTimeout(() => inputRefs.current[focusIdx]?.focus(), 0)
+    }
   }, [])
 
-  const setInputRef = useCallback((index: number, el: HTMLInputElement | null) => {
-    inputRefs.current[index] = el
-  }, [])
+  const setInputRef = useCallback(
+    (index: number, el: HTMLInputElement | null) => {
+      inputRefs.current[index] = el
+    },
+    []
+  )
 
   const code = digits.join('')
   const isValid = code.length === OTP_LENGTH
 
   const handleConfirm = useCallback(() => {
     if (!isValid) return
-    setAuth({ token: 'otp-token', user: { id: phone || 'user', username: displayPhone } })
+    setAuth({
+      token: 'otp-token',
+      user: { id: phone || 'user', username: displayPhone },
+    })
     navigate('/chat', { replace: true })
   }, [isValid, phone, displayPhone, setAuth, navigate])
 
@@ -115,13 +140,14 @@ function VerifyCode() {
     <div className="min-h-screen flex flex-col bg-white" dir="rtl">
       <VerifyCodeHeader />
 
-      <div className="flex-1 flex flex-col px-6 py-8 min-h-0">
+      <main className="flex-1 flex flex-col px-6 py-4 min-h-0" id="main-content" aria-label="محتوای صفحه تأیید کد">
         <h1 className="mb-2 text-right font-semibold text-lg text-gray-800">
           کد تایید را وارد کنید
         </h1>
 
-        <p className="text-gray-600 text-right my-6 font-normal text-sm">
-          کد ۵ رقمی به شماره <PersianNumber>{displayPhone}</PersianNumber> ارسال شد.
+        <p className="text-gray-600 text-right my-6 font-normal text-[14px]">
+          کد ۵ رقمی به شماره <PersianNumber>{displayPhone}</PersianNumber> ارسال
+          شد.
         </p>
 
         <OtpInputs
@@ -138,7 +164,7 @@ function VerifyCode() {
           secondsLeft={secondsLeft}
           onResend={handleResend}
         />
-      </div>
+      </main>
     </div>
   )
 }

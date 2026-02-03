@@ -2,9 +2,9 @@ import { memo } from 'react'
 import type { ChatColor } from '../../store/themeStore'
 
 const CHAT_COLORS: { value: ChatColor; hex: string }[] = [
-  { value: 'purple', hex: '#6B21A8' },
-  { value: 'black', hex: '#000000' },
-  { value: 'cyan', hex: '#0095DA' },
+  { value: 'purple', hex: '#A955A8' },
+  { value: 'black', hex: '#1E1E1E' },
+  { value: 'cyan', hex: '#3DB3EA' },
 ]
 
 interface ChatColorPickerProps {

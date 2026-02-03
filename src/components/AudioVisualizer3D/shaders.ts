@@ -74,9 +74,10 @@ void main() {
 export const fragmentShader = `
 precision highp float;
 uniform vec2 u_resolution;
+uniform vec3 u_color;
 
 void main() {
   vec2 st = gl_FragCoord.xy / max(u_resolution, vec2(1.0));
-  gl_FragColor = vec4(0.2, 0.6, 1.0, 1.0);
+  gl_FragColor = vec4(u_color, 1.0);
 }
 `

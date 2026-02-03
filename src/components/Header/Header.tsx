@@ -24,13 +24,19 @@ function Header({ showBack = false, onMenuClick, centerContent }: HeaderProps) {
     }
   }
 
+  const isSettings = location.pathname === '/settings'
+
   return (
     <header className="flex items-center justify-between p-4 shrink-0">
       <button
-        onClick={handleMenuClick}
-        className="p-2 hover:bg-gray-100 rounded-[14px] transition-colors shrink-0"
+        type="button"
+        onClick={isSettings ? () => navigate(-1) : handleMenuClick}
+        className="w-11 h-10 min-w-11 py-2 hover:bg-gray-100 rounded-[14px] transition-colors shrink-0 flex items-center justify-center"
+        style={{ color: '#000000' }}
+        aria-label={isSettings ? 'بازگشت' : 'منو'}
+        title={isSettings ? 'بازگشت' : 'منو'}
       >
-        <MenuIcon />
+        {isSettings ? <BackIcon size={24} /> : <MenuIcon size={24} />}
       </button>
 
       {centerContent ? (
@@ -41,8 +47,12 @@ function Header({ showBack = false, onMenuClick, centerContent }: HeaderProps) {
 
       {showBack ? (
         <button
+          type="button"
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-[14px] transition-colors shrink-0"
+          className="py-2 pe-0 ps-1 hover:bg-gray-100 rounded-[14px] transition-colors shrink-0 flex items-center justify-center"
+          style={{ color: '#000000' }}
+          aria-label="بازگشت"
+          title="بازگشت"
         >
           <BackIcon />
         </button>

@@ -6,10 +6,10 @@ const INTRO_TEXT =
 function LoginIntroCardInner() {
   return (
     <div className="w-full max-w-sm rounded-2xl px-5 py-6 bg-white">
-      <h1 className="mb-4 text-center font-semibold text-lg text-gray-800">
+      <h1 className="mb-4 text-center font-bold text-2xl" style={{ color: '#292F52' }}>
         همیار بات
       </h1>
-      <p className="text-[14px] text-gray-600 text-center leading-relaxed">
+      <p className="text-[14px] font-normal text-center leading-relaxed" style={{ color: '#292F52' }}>
         {INTRO_TEXT}
       </p>
     </div>

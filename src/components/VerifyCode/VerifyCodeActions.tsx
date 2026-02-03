@@ -24,7 +24,7 @@ function VerifyCodeActionsInner({
 }: VerifyCodeActionsProps) {
   return (
     <div className="mt-auto pt-6 flex flex-col gap-4">
-      <Button variant="primary" onClick={onConfirm} disabled={!isValid}>
+      <Button variant="primary" onClick={onConfirm} disabled={!isValid} className="font-bold text-[16px]">
         تایید
       </Button>
       <p className="text-sm text-gray-600 text-center">

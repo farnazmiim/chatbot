@@ -3,9 +3,15 @@ import { useLocation } from 'react-router-dom'
 import AppLayout from '../../components/AppLayout/AppLayout'
 import Avatar from '../../components/Avatar/Avatar'
 import ChatBubble from '../../components/ChatBubble/ChatBubble'
+import {
+  LocationTargetIcon,
+  EditPencilIcon,
+  SendPaperIcon,
+} from '../../components/Icons'
 import InputField from '../../components/InputField/InputField'
 import VoiceVideoOverlay from '../../components/VoiceVideoOverlay/VoiceVideoOverlay'
 import ChatModeBar, { type ChatMode } from '../../components/ChatModeBar/ChatModeBar'
+import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 
 type MessageItem = { type: 'user' | 'bot'; text: string; id: number }
 
@@ -18,23 +24,21 @@ const LOADING_BOX_STYLE = { backgroundColor: '#F3F4F6' } as const
 const INTRO_TEXT =
   'من، ربات پاسخگوی همراه اول، به سوالات شما درباره سرویس‌ها، تعرفه‌ها، طرح‌های تشویقی، صورتحساب و شارژ پاسخ می‌دهم. لطفاً پس از دریافت پاسخ، با انتخاب   یا    و ذکر دلیل، به بهبود عملکرد من کمک کنید.'
 
+const CARD_ICONS = [
+  LocationTargetIcon,
+  EditPencilIcon,
+  SendPaperIcon,
+] as const
+
 const DEFAULT_CARDS = [
-  {
-    id: 1,
-    text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از',
-  },
-  {
-    id: 2,
-    text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از',
-  },
-  {
-    id: 3,
-    text: 'لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از',
-  },
+  { id: 1, text: 'چطور بسته اینترنت بخرم؟' },
+  { id: 2, text: 'موجودی حساب و شارژ سیم‌کارت' },
+  { id: 3, text: 'تعرفه تماس و پیامک' },
 ]
 
 function Chat() {
   const location = useLocation()
+  useDocumentTitle('چت')
   const [mode, setMode] = useState<ChatMode>(
     (location.state as { openVoice?: boolean } | null)?.openVoice ? 'voice' : 'chat'
   )
@@ -46,6 +50,7 @@ function Chat() {
   const [messages, setMessages] = useState<MessageItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const bottomAnchorRef = useRef<HTMLDivElement>(null)
   const nextIdRef = useRef(0)
 
   const handleCopied = useCallback(() => {
@@ -54,10 +59,18 @@ function Chat() {
   }, [])
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: 'smooth',
-    })
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const behavior = prefersReducedMotion ? 'auto' : 'smooth'
+    const scrollToBottom = () => {
+      bottomAnchorRef.current?.scrollIntoView({ behavior, block: 'end' })
+    }
+    scrollToBottom()
+    const t = setTimeout(scrollToBottom, 50)
+    const t2 = setTimeout(scrollToBottom, 300)
+    return () => {
+      clearTimeout(t)
+      clearTimeout(t2)
+    }
   }, [messages, isLoading])
 
   const handleVoiceClick = useCallback(() => {
@@ -85,7 +98,6 @@ function Chat() {
 
   return (
     <AppLayout
-      showBack={true}
       headerCenter={
         <ChatModeBar
           compact
@@ -109,10 +121,13 @@ function Chat() {
         <div
           ref={scrollRef}
           className="flex-1 flex flex-col px-4 py-6 overflow-y-auto min-h-0 bg-white"
+          role="region"
+          aria-label="لیست پیام‌ها"
         >
+          <h1 className="sr-only">چت</h1>
           {messages.length === 0 && (
             <>
-              <div className="w-full flex flex-col items-center justify-start">
+              <div className="w-full flex flex-col items-center justify-start mb-6">
                 <Avatar type="bot" size="md" className="mx-auto" />
               </div>
               <p
@@ -125,20 +140,25 @@ function Chat() {
                 className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4"
                 dir="rtl"
               >
-                {DEFAULT_CARDS.map((card) => (
-                  <div
-                    key={card.id}
-                    className="flex-shrink-0 w-[170px] rounded-xl bg-white p-2.5"
-                    style={CARD_STYLE}
-                  >
-                    <p
-                      className="text-gray-700 text-xs leading-relaxed text-right line-clamp-3"
+                {DEFAULT_CARDS.map((card, index) => {
+                  const Icon = CARD_ICONS[index]
+                  return (
+                    <div
+                      key={card.id}
+                      className="flex-shrink-0 w-[145px] rounded-xl bg-white p-2.5 flex flex-col items-start gap-2"
                       dir="rtl"
+                      style={CARD_STYLE}
                     >
-                      {card.text}
-                    </p>
-                  </div>
-                ))}
+                      <Icon className="w-4 h-[15px] shrink-0" />
+                      <p
+                        className="text-gray-700 text-xs leading-relaxed text-right line-clamp-3 w-full"
+                        dir="rtl"
+                      >
+                        {card.text}
+                      </p>
+                    </div>
+                  )
+                })}
               </div>
             </>
           )}
@@ -166,10 +186,11 @@ function Chat() {
               </div>
             </div>
           )}
+          <div ref={bottomAnchorRef} className="min-h-1 shrink-0" aria-hidden />
         </div>
 
         <InputField
-          placeholder="سلام چطوری؟"
+          placeholder="اینجا بنویسید.."
           onSend={handleSend}
           onVoiceClick={handleVoiceClick}
         />

@@ -8,11 +8,13 @@ function VerifyCodeHeaderInner() {
     <header className="flex items-center justify-between p-4 shrink-0">
       <Link
         to="/"
-        className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-[14px] transition-colors no-underline"
+        className="flex items-center gap-2 hover:bg-gray-100 rounded-[14px] transition-colors no-underline"
+        style={{ color: '#000000' }}
         aria-label="صفحه قبلی"
       >
-        <BackIcon />
-        <span className="text-sm text-gray-800">صفحه قبلی</span>
+        <span className="inline-flex items-center shrink-0 leading-none">
+          <BackIcon />
+        </span>
       </Link>
       <div className="flex items-center justify-center w-[100px] h-[45px] shrink-0">
         <Logo width={100} height={45} />

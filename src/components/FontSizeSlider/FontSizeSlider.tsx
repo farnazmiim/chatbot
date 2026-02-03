@@ -30,7 +30,7 @@ function FontSizeSlider({
   const fillPercent = ((value - 12) / (24 - 12)) * 100
 
   return (
-    <div className={`py-4 ${className}`}>
+    <div className={`pt-4 pb-1 ${className}`}>
       <div className="flex items-center justify-between mb-3" dir="rtl">
         <span
           style={{

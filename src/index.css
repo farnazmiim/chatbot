@@ -86,6 +86,35 @@ input[type='range'].font-size-slider::-moz-range-thumb {
     overflow: hidden;
   }
 
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid #0095da;
+    outline-offset: 2px;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #0095da;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
   @media (min-width: 768px) {
     html {
       overflow: auto;

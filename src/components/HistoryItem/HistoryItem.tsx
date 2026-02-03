@@ -14,11 +14,13 @@ function HistoryItem({
   className = '',
 }: HistoryItemProps) {
   return (
-    <div className={`flex items-center gap-3 py-2 ${className}`}>
+    <div
+      className={`flex items-center gap-3 py-2 ${className}`}
+      dir="rtl"
+    >
       <ChatBubbleIcon className="w-[10px] h-[12px] flex-shrink-0" />
-
-      <div className="flex-1 min-w-0">
-        <p className="text-gray-800 font-normal text-xs leading-relaxed">{text}</p>
+      <div className="flex-1 min-w-0 text-right">
+        <p className="font-normal text-xs leading-relaxed text-[#2A2A2A]">{text}</p>
         {date && <p className="text-gray-600 text-xs mt-1">{date}</p>}
       </div>
     </div>

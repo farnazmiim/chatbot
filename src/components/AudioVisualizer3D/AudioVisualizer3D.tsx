@@ -1,5 +1,17 @@
 import { useEffect, useRef, useCallback } from 'react'
 import * as THREE from 'three'
+import { useThemeStore } from '../../store/themeStore'
+
+const CHAT_COLOR_HEX = {
+  purple: '#A955A8',
+  black: '#1E1E1E',
+  cyan: '#3DB3EA',
+} as const
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16)
+  return [(n >> 16) / 255, ((n >> 8) & 0xff) / 255, (n & 0xff) / 255]
+}
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
@@ -58,6 +70,7 @@ export default function AudioVisualizer3D({
     u_time: { value: number }
     u_frequency: { value: number }
     u_resolution: { value: { set: (x: number, y: number) => void } }
+    u_color: { value: { set: (x: number, y: number, z: number) => void } }
   } | null>(null)
   const wasPlayingRef = useRef(false)
   const userStoppedRef = useRef(false)
@@ -68,6 +81,8 @@ export default function AudioVisualizer3D({
   const hideBackgroundRef = useRef(hideBackground)
   const rafRef = useRef<number>(0)
   const clockRef = useRef<{ getElapsedTime: () => number } | null>(null)
+  const chatColor = useThemeStore((s) => s.chatColor)
+  const accentRgb = hexToRgb(CHAT_COLOR_HEX[chatColor])
   const micRef = useRef<{
     context: AudioContext
     stream: MediaStream
@@ -81,7 +96,7 @@ export default function AudioVisualizer3D({
   isMutedRef.current = isMuted
   hideBackgroundRef.current = hideBackground
 
-  const init = useCallback((container: HTMLDivElement, isCompact: boolean, shouldHideBackground: boolean) => {
+  const init = useCallback((container: HTMLDivElement, isCompact: boolean, shouldHideBackground: boolean, rgb: [number, number, number]) => {
     const fallback = isCompact ? 48 : 384
     let w = container.clientWidth
     let h = container.clientHeight
@@ -144,6 +159,7 @@ export default function AudioVisualizer3D({
       u_time: { value: 0 },
       u_frequency: { value: 0 },
       u_resolution: { value: new THREE.Vector2(w, h) },
+      u_color: { value: new THREE.Vector3(rgb[0], rgb[1], rgb[2]) },
     }
     uniformsRef.current = uniforms
 
@@ -181,6 +197,14 @@ export default function AudioVisualizer3D({
     composerRef.current = composer
     clockRef.current = new THREE.Clock()
   }, [])
+
+  useEffect(() => {
+    const u = uniformsRef.current
+    if (u && u.u_color) {
+      const [r, g, b] = hexToRgb(CHAT_COLOR_HEX[chatColor])
+      u.u_color.value.set(r, g, b)
+    }
+  }, [chatColor])
 
   const animate = useCallback(() => {
     try {
@@ -272,7 +296,7 @@ export default function AudioVisualizer3D({
     const container = containerRef.current
     if (!container) return
 
-    init(container, compact, hideBackground)
+    init(container, compact, hideBackground, accentRgb)
 
     const onResize = () => {
       const r = rendererRef.current
